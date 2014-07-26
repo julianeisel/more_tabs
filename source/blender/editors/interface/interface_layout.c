@@ -1392,6 +1392,56 @@ void uiItemsEnumR(uiLayout *layout, struct PointerRNA *ptr, const char *propname
 	}
 }
 
+void uiItemTabsR(uiLayout *layout, PointerRNA *ptr, PropertyRNA *prop, const char *name,
+                 int icon, int alignment, int icon_only, int separate)
+{
+	uiBlock *block = layout->root->block;
+	uiBut *but;
+	EnumPropertyItem *item, *item_array;
+	int itemw, value, h = UI_UNIT_Y;
+	bool free;
+
+	RNA_property_enum_items_gettexted(block->evil_C, ptr, prop, &item_array, NULL, &free);
+
+	if (layout->root->type != UI_LAYOUT_MENU) {
+		uiBlockSetCurLayout(block, ui_item_local_sublayout(layout, layout, 1));
+	}
+	else {
+		uiBlockSetCurLayout(block, layout);
+	}
+
+	for (item = item_array; item->identifier; item++) {
+		if (!item->identifier[0])
+			continue;
+
+		name = (!name || name[0]) ? item->name : "";
+		icon = item->icon;
+		value = item->value;
+		itemw = ui_text_icon_width(block->curlayout, icon_only ? "" : name, icon, 0);
+
+		if (icon && name[0] && !icon_only)
+			but = uiDefIconTextButR_prop(block, TAB, 0, icon, name, 0, 0, itemw, h, ptr, prop, -1, 0, value, -1, -1, NULL);
+		else if (icon)
+			but = uiDefIconButR_prop(block, TAB, 0, icon, 0, 0, 1.35f * itemw, h, ptr, prop, -1, 0, value, -1, -1, NULL);
+		else
+			but = uiDefButR_prop(block, TAB, 0, name, 0, 0, 0.9f * itemw, h, ptr, prop, -1, 0, value, -1, -1, NULL);
+
+		if (RNA_property_flag(prop) & PROP_ENUM_FLAG) {
+			uiButSetFunc(but, ui_item_enum_expand_handle, but, SET_INT_IN_POINTER(value));
+		}
+
+		but->drawflag |= alignment;
+
+		if (separate)
+			but->drawflag |= UI_BUT_SEP;
+	}
+	uiBlockSetCurLayout(block, layout);
+
+	if (free) {
+		MEM_freeN(item_array);
+	}
+}
+
 /* Pointer RNA button with search */
 
 typedef struct CollItemSearch {

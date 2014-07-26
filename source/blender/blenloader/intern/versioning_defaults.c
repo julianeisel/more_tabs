@@ -25,8 +25,11 @@
  *  \ingroup blenloader
  */
 
+#include "BLI_listbase.h"
 #include "BLI_utildefines.h"
 #include "BLI_math.h"
+
+#include "MEM_guardedalloc.h"
 
 #include "DNA_brush_types.h"
 #include "DNA_freestyle_types.h"
@@ -111,6 +114,30 @@ void BLO_update_defaults_startup_blend(Main *bmain)
 					if (space_link->spacetype == SPACE_CLIP) {
 						SpaceClip *space_clip = (SpaceClip *) space_link;
 						space_clip->flag &= ~SC_MANUAL_CALIBRATION;
+					}
+					else if (space_link->spacetype == SPACE_BUTS) {
+						ARegion *ar, *arhead;
+						ListBase *lb;
+
+						if (space_link == area->spacedata.first) {
+							lb = &area->regionbase;
+						}
+						else {
+							lb = &space_link->regionbase;
+						}
+
+						/* if the header gets flipped to the top, we want it to be above the tabs! */
+						for (arhead = lb->first; arhead; arhead = arhead->next) {
+							if (arhead->regiontype == RGN_TYPE_HEADER) {
+								arhead->alignment = RGN_ALIGN_BOTTOM;
+								break;
+							}
+						}
+
+						ar = MEM_callocN(sizeof(ARegion), "area region from do_versions");
+						BLI_insertlinkafter(lb, arhead, ar);
+						ar->regiontype = RGN_TYPE_TABS;
+						ar->alignment = RGN_ALIGN_TOP;
 					}
 				}
 			}

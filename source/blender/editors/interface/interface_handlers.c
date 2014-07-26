@@ -1601,6 +1601,7 @@ static void ui_apply_button(bContext *C, uiBlock *block, uiBut *but, uiHandleBut
 			break;
 		case ROW:
 		case LISTROW:
+		case TAB:
 			ui_apply_but_ROW(C, block, but, data);
 			break;
 		case SCROLL:
@@ -3103,6 +3104,17 @@ static int ui_do_but_KEYEVT(bContext *C, uiBut *but, uiHandleButtonData *data, c
 				data->cancel = true;
 
 			button_activate_state(C, but, BUTTON_STATE_EXIT);
+		}
+	}
+
+	return WM_UI_HANDLER_CONTINUE;
+}
+
+static int ui_do_but_TAB(bContext *C, uiBut *but, uiHandleButtonData *data, const wmEvent *event) {
+	if (data->state == BUTTON_STATE_HIGHLIGHT) {
+		if (ELEM(event->type, LEFTMOUSE, PADENTER, RETKEY) && event->val == KM_RELEASE) {
+			button_activate_state(C, but, BUTTON_STATE_EXIT);
+			return WM_UI_HANDLER_CONTINUE;
 		}
 	}
 
@@ -6202,6 +6214,9 @@ static int ui_do_button(bContext *C, uiBlock *block, uiBut *but, const wmEvent *
 		case HOTKEYEVT:
 			retval = ui_do_but_HOTKEYEVT(C, but, data, event);
 			break;
+		case TAB:
+			retval = ui_do_but_TAB(C, but, data, event);
+			break;
 		case TOGBUT:
 		case TOG:
 		case ICONTOG:
@@ -6386,6 +6401,20 @@ uiBut *ui_but_find_activated(ARegion *ar)
 		for (but = block->buttons.first; but; but = but->next)
 			if (but->active)
 				return but;
+
+	return NULL;
+}
+
+uiBut *ui_but_find_activated_tab(const ARegion *ar)
+{
+	uiBlock *block;
+	uiBut *but;
+
+	if (ar->regiontype == RGN_TYPE_TABS)
+		for (block = ar->uiblocks.first; block; block = block->next)
+			for (but = block->buttons.first; but; but = but->next)
+				if (but->type == TAB && (but->flag & UI_SELECT))
+					return but;
 
 	return NULL;
 }
@@ -8456,6 +8485,47 @@ static int ui_handle_menus_recursive(
 
 /* *************** UI event handlers **************** */
 
+static int ui_handler_tab_region(bContext *C, const wmEvent *event, ARegion *ar)
+{
+	ScrArea *sa = CTX_wm_area(C);
+
+	if (ELEM(event->type, WHEELUPMOUSE, WHEELDOWNMOUSE)) {
+		uiBut *nextbut, *but = NULL;
+
+		if (ar->regiontype == RGN_TYPE_TABS);
+		else if ((sa->flag & AREA_CONTAINS_TABS) && event->ctrl)
+			ar = BKE_area_find_region_type(sa, RGN_TYPE_TABS);
+
+		else
+			return WM_UI_HANDLER_CONTINUE;
+
+		but = ui_but_find_activated_tab(ar);
+
+		if (!but) {
+			WM_event_add_mousemove(C);
+			return WM_UI_HANDLER_CONTINUE;
+		}
+
+		if (event->type == WHEELUPMOUSE) {
+			if (but->next == NULL)
+				nextbut = but->block->buttons.first;
+			else
+				nextbut = but->next;
+		}
+		else {
+			if (but->prev == NULL)
+				nextbut = but->block->buttons.last;
+			else
+				nextbut = but->prev;
+		}
+
+		ui_handle_button_activate(C, ar, nextbut, BUTTON_ACTIVATE_APPLY);
+
+		return WM_UI_HANDLER_BREAK;
+	}
+	return WM_UI_HANDLER_CONTINUE;
+}
+
 static int ui_handler_region(bContext *C, const wmEvent *event, void *UNUSED(userdata))
 {
 	ARegion *ar;
@@ -8474,6 +8544,9 @@ static int ui_handler_region(bContext *C, const wmEvent *event, void *UNUSED(use
 	but = ui_but_find_activated(ar);
 
 	retval = ui_handler_panel_region(C, event, ar);
+
+	if (retval == WM_UI_HANDLER_CONTINUE)
+		retval = ui_handler_tab_region(C, event, ar);
 
 	if (retval == WM_UI_HANDLER_CONTINUE)
 		retval = ui_handle_list_event(C, event, ar);

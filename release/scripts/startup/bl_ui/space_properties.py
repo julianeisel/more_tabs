@@ -18,7 +18,7 @@
 
 # <pep8 compliant>
 import bpy
-from bpy.types import Header
+from bpy.types import Header, Panel
 
 
 class PROPERTIES_HT_header(Header):
@@ -31,8 +31,20 @@ class PROPERTIES_HT_header(Header):
 
         row = layout.row()
         row.template_header()
-        row.prop(view, "context", expand=True, icon_only=True)
+        
+class USERPREF_PT_tabs(Panel):
+    bl_label = ""
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'TABS'
+    bl_options = {'HIDE_HEADER'}
 
+    def draw(self, context):
+        layout = self.layout
+
+        view = context.space_data
+
+        layout.prop_tabs(view, "context", icon_only=True, separate=False)
+        
 
 def register():
     bpy.utils.register_module(__name__)

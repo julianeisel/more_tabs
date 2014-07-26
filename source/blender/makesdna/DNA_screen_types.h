@@ -277,6 +277,7 @@ typedef struct ARegion {
 #define AREA_TEMP_INFO			8
 #define AREA_FLAG_DRAWSPLIT_H	16
 #define AREA_FLAG_DRAWSPLIT_V	32
+#define AREA_CONTAINS_TABS		64
 
 #define EDGEWIDTH	1
 #define AREAGRID	4
@@ -359,7 +360,8 @@ enum {
 	RGN_TYPE_UI = 4,
 	RGN_TYPE_TOOLS = 5,
 	RGN_TYPE_TOOL_PROPS = 6,
-	RGN_TYPE_PREVIEW = 7
+	RGN_TYPE_PREVIEW = 7,
+	RGN_TYPE_TABS = 8
 };
 
 /* region alignment */

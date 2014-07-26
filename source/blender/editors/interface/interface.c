@@ -1354,6 +1354,7 @@ int ui_is_but_push_ex(uiBut *but, double *value)
 				break;
 			case ROW:
 			case LISTROW:
+			case TAB:
 				UI_GET_BUT_VALUE_INIT(but, *value);
 				/* support for rna enum buts */
 				if (but->rnaprop && (RNA_property_flag(but->rnaprop) & PROP_ENUM_FLAG)) {
@@ -2768,6 +2769,9 @@ static void ui_block_do_align_but(uiBut *first, short nr)
 	
 	/* note;  how it uses 'flag' in loop below (either set it, or OR it) is confusing */
 	for (but = first, prev = NULL; but && but->alignnr == nr; prev = but, but = but->next) {
+		if (but->type == TAB)
+			continue;
+
 		next = but->next;
 		if (next && next->alignnr != nr)
 			next = NULL;

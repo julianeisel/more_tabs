@@ -68,7 +68,7 @@ static SpaceLink *buttons_new(const bContext *UNUSED(C))
 	
 	BLI_addtail(&sbuts->regionbase, ar);
 	ar->regiontype = RGN_TYPE_HEADER;
-	ar->alignment = RGN_ALIGN_TOP;
+	ar->alignment = RGN_ALIGN_BOTTOM;
 	
 #if 0
 	/* context area */
@@ -77,6 +77,13 @@ static SpaceLink *buttons_new(const bContext *UNUSED(C))
 	ar->regiontype = RGN_TYPE_CHANNELS;
 	ar->alignment = RGN_ALIGN_TOP;
 #endif
+
+	/* tab region */
+	ar = MEM_callocN(sizeof(ARegion), "tab area for buts");
+
+	BLI_addtail(&sbuts->regionbase, ar);
+	ar->regiontype = RGN_TYPE_TABS;
+	ar->alignment = RGN_ALIGN_TOP;
 
 	/* main area */
 	ar = MEM_callocN(sizeof(ARegion), "main area for buts");
@@ -193,6 +200,26 @@ static void buttons_keymap(struct wmKeyConfig *keyconf)
 	WM_keymap_add_item(keymap, "BUTTONS_OT_toolbox", RIGHTMOUSE, KM_PRESS, 0, 0);
 }
 
+static void buttons_tab_area_init(wmWindowManager *wm, ARegion *ar)
+{
+	ar->v2d.scroll = (V2D_SCROLL_VERTICAL_HIDE);
+	ED_region_panels_init(wm, ar);
+}
+
+static void buttons_tab_area_draw(const bContext *C, ARegion *ar)
+{
+	SpaceButs *sbuts = CTX_wm_space_buts(C);
+
+	/* Needed for RNA to get the good values! */
+	buttons_context_compute(C, sbuts);
+
+	ED_region_panels(C, ar, 1, NULL, -1);
+
+	ar->v2d.keepzoom = (V2D_KEEPASPECT | V2D_LIMITZOOM | V2D_KEEPZOOM);
+	ar->v2d.minzoom = ar->v2d.maxzoom = 1.0f;
+	ar->v2d.keepofs = V2D_LOCKOFS_Y;
+}
+
 /* add handlers, stuff you only do once or on area/region changes */
 static void buttons_header_area_init(wmWindowManager *UNUSED(wm), ARegion *ar)
 {
@@ -201,11 +228,6 @@ static void buttons_header_area_init(wmWindowManager *UNUSED(wm), ARegion *ar)
 
 static void buttons_header_area_draw(const bContext *C, ARegion *ar)
 {
-	SpaceButs *sbuts = CTX_wm_space_buts(C);
-
-	/* Needed for RNA to get the good values! */
-	buttons_context_compute(C, sbuts);
-
 	ED_region_header(C, ar);
 }
 
@@ -415,6 +437,14 @@ void ED_spacetype_buttons(void)
 	BLI_addhead(&st->regiontypes, art);
 
 	buttons_context_register(art);
+
+	/* regions: tab region */
+	art = MEM_callocN(sizeof(ARegionType), "spacetype buttons region");
+	art->regionid = RGN_TYPE_TABS;
+	art->init = buttons_tab_area_init;
+	art->draw = buttons_tab_area_draw;
+	art->keymapflag = ED_KEYMAP_UI;
+	BLI_addhead(&st->regiontypes, art);
 	
 	/* regions: header */
 	art = MEM_callocN(sizeof(ARegionType), "spacetype buttons region");

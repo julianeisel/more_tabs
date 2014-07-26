@@ -72,6 +72,7 @@ typedef enum {
 	UI_WTYPE_NUMBER,
 	UI_WTYPE_SLIDER,
 	UI_WTYPE_EXEC,
+	UI_WTYPE_TAB,
 	UI_WTYPE_TOOLTIP,
 	
 	/* strings */
@@ -564,6 +565,7 @@ void ui_button_clipboard_free(void);
 void ui_panel_menu(struct bContext *C, ARegion *ar, Panel *pa);
 uiBut *ui_but_find_old(uiBlock *block_old, const uiBut *but_new);
 uiBut *ui_but_find_new(uiBlock *block_old, const uiBut *but_new);
+uiBut *ui_but_find_activated_tab(const struct ARegion *ar);
 
 /* interface_widgets.c */
 void ui_draw_anti_tria(float x1, float y1, float x2, float y2, float x3, float y3);
@@ -574,6 +576,8 @@ void ui_draw_tooltip_background(uiStyle *UNUSED(style), uiBlock *block, rcti *re
 void ui_draw_search_back(struct uiStyle *style, uiBlock *block, rcti *rect);
 bool ui_link_bezier_points(const rcti *rect, float coord_array[][2], int resol);
 void ui_draw_link_bezier(const rcti *rect);
+void ui_draw_but_TAB_outline(rcti *rect, float rad, int roundboxtype, unsigned char highlight[3],
+                             unsigned char highlight_fade[3]);
 
 extern void ui_draw_but(const struct bContext *C, ARegion *ar, struct uiStyle *style, uiBut *but, rcti *rect);
 /* theme color init */

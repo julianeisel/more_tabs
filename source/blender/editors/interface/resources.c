@@ -164,7 +164,7 @@ const unsigned char *UI_ThemeGetColorPtr(bTheme *btheme, int spacetype, int colo
 
 			switch (colorid) {
 				case TH_BACK:
-					if (theme_regionid == RGN_TYPE_WINDOW)
+					if (ELEM(theme_regionid, RGN_TYPE_WINDOW, RGN_TYPE_TABS))
 						cp = ts->back;
 					else if (theme_regionid == RGN_TYPE_CHANNELS)
 						cp = ts->list;
@@ -184,7 +184,7 @@ const unsigned char *UI_ThemeGetColorPtr(bTheme *btheme, int spacetype, int colo
 					setting = ts->gradients.show_grad;
 					break;
 				case TH_TEXT:
-					if (theme_regionid == RGN_TYPE_WINDOW)
+					if (ELEM(theme_regionid, RGN_TYPE_WINDOW, RGN_TYPE_TABS))
 						cp = ts->text;
 					else if (theme_regionid == RGN_TYPE_CHANNELS)
 						cp = ts->list_text;
@@ -2429,8 +2429,25 @@ void init_userdef_do_versions(void)
 
 	if (U.versionfile < 271) {
 		bTheme *btheme;
+
+		/* interface_widgets.c */
+		struct uiWidgetColors wcol_tab = {
+			{255, 255, 255, 255},
+			{83, 83, 83, 255},		/* gets overwritten later */
+			{114, 114, 114, 255},	/* gets overwritten later */
+			{90, 90, 90, 255},
+
+			{0, 0, 0, 255},			/* gets overwritten later */
+			{0, 0, 0, 255},
+
+			0,
+			0, 0
+		};
+
 		for (btheme = U.themes.first; btheme; btheme = btheme->next) {
 			rgba_char_args_set(btheme->tui.wcol_tooltip.text, 255, 255, 255, 255);
+
+			btheme->tui.wcol_tab = wcol_tab;
 		}
 	}
 

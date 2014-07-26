@@ -185,6 +185,8 @@ enum {
 
 #define UI_PANEL_CATEGORY_MARGIN_WIDTH (U.widget_unit * 1.0f)
 
+#define UI_TAB_REGION_MARGIN_HEIGHT (U.widget_unit * 1.15f)
+
 /* but->drawflag - these flags should only affect how the button is drawn. */
 /* Note: currently, these flags _are not passed_ to the widget's state() or draw() functions
  *       (except for the 'align' ones)!
@@ -196,6 +198,8 @@ enum {
 	UI_BUT_TEXT_RIGHT        = (1 << 3),
 	/* Prevent the button to show any tooltip. */
 	UI_BUT_NO_TOOLTIP        = (1 << 4),
+	/* special flag for tabs - add whitespace between tabs */
+	UI_BUT_SEP               = (1 << 5),
 	/* button align flag, for drawing groups together (also used in uiBlock->flag!) */
 	UI_BUT_ALIGN_TOP         = (1 << 14),
 	UI_BUT_ALIGN_LEFT        = (1 << 15),
@@ -239,6 +243,7 @@ typedef enum {
 	TOGN          = (9 << 9),
 	LABEL         = (10 << 9),
 	MENU          = (11 << 9),  /* Dropdown list, actually! */
+	TAB           = (12 << 9),
 	ICONTOG       = (13 << 9),
 	NUMSLI        = (14 << 9),
 	COLOR         = (15 << 9),
@@ -909,6 +914,7 @@ void uiItemFullR(uiLayout *layout, struct PointerRNA *ptr, struct PropertyRNA *p
 void uiItemEnumR(uiLayout *layout, const char *name, int icon, struct PointerRNA *ptr, const char *propname, int value);
 void uiItemEnumR_string(uiLayout *layout, struct PointerRNA *ptr, const char *propname, const char *value, const char *name, int icon);
 void uiItemsEnumR(uiLayout *layout, struct PointerRNA *ptr, const char *propname);
+void uiItemTabsR(uiLayout *layout, struct PointerRNA *ptr, struct PropertyRNA *prop, const char *name, int icon, int alignment, int icon_only, int separate);
 void uiItemPointerR(uiLayout *layout, struct PointerRNA *ptr, const char *propname, struct PointerRNA *searchptr, const char *searchpropname, const char *name, int icon);
 void uiItemsFullEnumO(uiLayout *layout, const char *opname, const char *propname, struct IDProperty *properties, int context, int flag);
 
