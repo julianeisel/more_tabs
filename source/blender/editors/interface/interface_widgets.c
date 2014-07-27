@@ -1935,11 +1935,14 @@ static void widget_state_menu_item(uiWidgetType *wt, int state)
 
 static void widget_state_tab(uiWidgetType *wt, int state)
 {
-	unsigned char col_tab_inactive[4], col_tab_active[4], col_tab_text[3];
+	unsigned char col_tab_active[4], col_tab_inactive[4], col_tab_text[3];
 
 	/* tabs are using special theme colors */
+	if (UI_GetThemeValue(TH_TAB_USE_ACTIVE))
+		UI_GetThemeColor4ubv(TH_TAB_ACTIVE, col_tab_active);
+	else
+		UI_GetThemeColor4ubv(TH_BACK, col_tab_active); /* updates the active tab color to always match the region color */
 	UI_GetThemeColor4ubv(TH_TAB_INACTIVE, col_tab_inactive);
-	UI_GetThemeColor4ubv(TH_BACK, col_tab_active); /* updates the active tab color to always match the region color */
 	UI_GetThemeColor3ubv(TH_TEXT, col_tab_text); /* updates the font color to always match the region color */
 
 	copy_v3_v3_char(wt->wcol_theme->inner, (char *)col_tab_inactive);

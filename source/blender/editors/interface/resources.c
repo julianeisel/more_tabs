@@ -249,14 +249,17 @@ const unsigned char *UI_ThemeGetColorPtr(bTheme *btheme, int spacetype, int colo
 				case TH_BUTBACK_TEXT_HI:
 					cp = ts->button_text_hi; break;
 
+				case TH_TAB_USE_ACTIVE:
+					cp = &setting;
+					setting = ts->tabs.use_tab_active; break;
 				case TH_TAB_ACTIVE:
-					cp = ts->tab_active; break;
+					cp = ts->tabs.tab_active; break;
 				case TH_TAB_INACTIVE:
-					cp = ts->tab_inactive; break;
+					cp = ts->tabs.tab_inactive; break;
 				case TH_TAB_BACK:
-					cp = ts->tab_back; break;
+					cp = ts->tabs.tab_back; break;
 				case TH_TAB_OUTLINE:
-					cp = ts->tab_outline; break;
+					cp = ts->tabs.tab_outline; break;
 
 				case TH_SHADE1:
 					cp = ts->shade1; break;
@@ -754,10 +757,11 @@ static void ui_theme_init_new_do(ThemeSpace *ts)
 	rgba_char_args_set(ts->list_text,      0, 0, 0, 255);
 	rgba_char_args_set(ts->list_text_hi,   255, 255, 255, 255);
 
-	rgba_char_args_set(ts->tab_active,     114, 114, 114, 255);
-	rgba_char_args_set(ts->tab_inactive,   83, 83, 83, 255);
-	rgba_char_args_set(ts->tab_back,       64, 64, 64, 255);
-	rgba_char_args_set(ts->tab_outline,    60, 60, 60, 255);
+	ts->tabs.use_tab_active = false;
+	rgba_char_args_set(ts->tabs.tab_active,     114, 114, 114, 255);
+	rgba_char_args_set(ts->tabs.tab_inactive,   83, 83, 83, 255);
+	rgba_char_args_set(ts->tabs.tab_back,       64, 64, 64, 255);
+	rgba_char_args_set(ts->tabs.tab_outline,    60, 60, 60, 255);
 }
 
 static void ui_theme_init_new(bTheme *btheme)
@@ -2419,10 +2423,10 @@ void init_userdef_do_versions(void)
 			ThemeSpace *ts;
 
 			for (ts = UI_THEMESPACE_START(btheme); ts != UI_THEMESPACE_END(btheme); ts++) {
-				rgba_char_args_set(ts->tab_active, 114, 114, 114, 255);
-				rgba_char_args_set(ts->tab_inactive, 83, 83, 83, 255);
-				rgba_char_args_set(ts->tab_back, 64, 64, 64, 255);
-				rgba_char_args_set(ts->tab_outline, 60, 60, 60, 255);
+				rgba_char_args_set(ts->tabs.tab_active, 114, 114, 114, 255);
+				rgba_char_args_set(ts->tabs.tab_inactive, 83, 83, 83, 255);
+				rgba_char_args_set(ts->tabs.tab_back, 64, 64, 64, 255);
+				rgba_char_args_set(ts->tabs.tab_outline, 60, 60, 60, 255);
 			}
 		}
 	}

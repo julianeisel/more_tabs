@@ -141,6 +141,15 @@ typedef struct uiWidgetStateColors {
 	float blend, pad;
 } uiWidgetStateColors;
 
+typedef struct uiTabColors {
+	char tab_active[4];
+	char tab_inactive[4];
+	char tab_back[4];
+	char tab_outline[4];
+	int use_tab_active;
+	int pad;
+} uiTabColors;
+
 typedef struct uiPanelColors {
 	char header[4];
 	char back[4];
@@ -166,6 +175,7 @@ typedef struct ThemeUI {
 	
 	uiWidgetStateColors wcol_state;
 
+	uiTabColors tab;
 	uiPanelColors panel; /* depricated, but we keep it for do_versions (2.66.1) */
 
 	/* fac: 0 - 1 for blend factor, width in pixels */
@@ -197,12 +207,6 @@ typedef struct ThemeSpace {
 	char header_text[4];
 	char header_text_hi[4];
 
-	/* region tabs */
-	char tab_active[4];
-	char tab_inactive[4];
-	char tab_back[4];
-	char tab_outline[4];
-
 	/* button/tool regions */
 	char button[4];			/* region background */
 	char button_title[4];	/* panel title */
@@ -220,7 +224,8 @@ typedef struct ThemeSpace {
 /*	char panel_title[4];	unused */
 /*	char panel_text[4];		unused */
 /*	char panel_text_hi[4];	unused */
-	
+
+	uiTabColors tabs;
 	/* note, cannot use name 'panel' because of DNA mapping old files */
 	uiPanelColors panelcolors;
 

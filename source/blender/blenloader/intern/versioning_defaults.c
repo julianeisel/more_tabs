@@ -138,6 +138,19 @@ void BLO_update_defaults_startup_blend(Main *bmain)
 						BLI_insertlinkafter(lb, arhead, ar);
 						ar->regiontype = RGN_TYPE_TABS;
 						ar->alignment = RGN_ALIGN_TOP;
+
+						{
+							View2D *v2d = &ar->v2d;
+
+							v2d->keepzoom = (V2D_KEEPASPECT | V2D_LIMITZOOM | V2D_KEEPZOOM);
+							v2d->minzoom = ar->v2d.maxzoom = 1.0f;
+
+							v2d->align = (V2D_ALIGN_NO_NEG_X | V2D_ALIGN_NO_POS_Y);
+							v2d->keeptot = V2D_KEEPTOT_STRICT;
+
+							/* no scrollers! */
+							v2d->scroll = 0;
+						}
 					}
 				}
 			}

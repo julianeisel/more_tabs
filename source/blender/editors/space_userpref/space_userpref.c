@@ -75,6 +75,19 @@ static SpaceLink *userpref_new(const bContext *UNUSED(C))
 	ar->regiontype = RGN_TYPE_TABS;
 	ar->alignment = RGN_ALIGN_TOP;
 
+	{
+		View2D *v2d = &ar->v2d;
+
+		v2d->keepzoom = (V2D_KEEPASPECT | V2D_LIMITZOOM | V2D_KEEPZOOM);
+		v2d->minzoom = ar->v2d.maxzoom = 1.0f;
+
+		v2d->align = (V2D_ALIGN_NO_NEG_X | V2D_ALIGN_NO_POS_Y);
+		v2d->keeptot = V2D_KEEPTOT_STRICT;
+
+		/* no scrollers! */
+		v2d->scroll = 0;
+	}
+
 	/* main area */
 	ar = MEM_callocN(sizeof(ARegion), "main area for userpref");
 
@@ -136,17 +149,19 @@ static void userpref_keymap(struct wmKeyConfig *UNUSED(keyconf))
 
 static void userpref_tab_area_init(wmWindowManager *wm, ARegion *ar)
 {
-	ar->v2d.scroll = (V2D_SCROLL_VERTICAL_HIDE);
-	ED_region_panels_init(wm, ar);
+	wmKeyMap *keymap;
+
+	UI_view2d_region_reinit(&ar->v2d, V2D_COMMONVIEW_CUSTOM, ar->winx, ar->winy);
+
+	keymap = WM_keymap_find(wm->defaultconf, "View2D Buttons List", 0, 0);
+	WM_event_add_keymap_handler(&ar->handlers, keymap);
 }
 
 static void userpref_tab_area_draw(const bContext *C, ARegion *ar)
 {
 	ED_region_panels(C, ar, 1, NULL, -1);
 
-	ar->v2d.keepzoom = (V2D_KEEPASPECT | V2D_LIMITZOOM | V2D_KEEPZOOM);
-	ar->v2d.minzoom = ar->v2d.maxzoom = 1.0f;
-	ar->v2d.keepofs = V2D_LOCKOFS_Y;
+	ar->v2d.keepofs = (V2D_LOCKOFS_Y);
 }
 
 /* add handlers, stuff you only do once or on area/region changes */

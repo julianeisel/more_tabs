@@ -1751,7 +1751,8 @@ void ED_region_panels(const bContext *C, ARegion *ar, int vertical, const char *
 				}
 				else if (ar->regiontype == RGN_TYPE_TABS) {
 					panelContext = UI_LAYOUT_HEADER;
-					layout = UI_LAYOUT_HORIZONTAL;
+					if (sa->spacetype != SPACE_USERPREF) /* silly exception but should be okay here */
+						layout = UI_LAYOUT_HORIZONTAL;
 				}
 				else {
 					panelContext = UI_LAYOUT_PANEL;
